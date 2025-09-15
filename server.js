@@ -7,6 +7,8 @@ const connectMongo = require('./server/database/connect');//requires connect.js 
 const PORT = process.env.PORT || 3100; //uses either what's in our env or 3100 as our port (you can use any unused port)
 
 
+
+
 app.set('view engine', 'ejs');//Put before app.use, etc. Lets us use EJS for views
 //use body-parser to parse requests
 app.use(bodyParser.urlencoded({extended:true}));
@@ -26,3 +28,20 @@ app.listen(PORT, function() {//specifies port to listen on
 	console.log('listening on '+ PORT);
 	console.log(`Welcome to the Drug Monitor App at http://localhost:${PORT}`);
 })
+// 404 handler (route không tồn tại)
+app.use((req, res, next) => {
+  const error = new Error("Page Not Found");
+  error.status = 404;
+  next(error);
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error("🔥 Error:", err.message);
+
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: err
+  });
+});

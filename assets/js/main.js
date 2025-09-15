@@ -63,4 +63,69 @@ $("#drug_days").submit(function(event){//on a submit event on the element with i
     alert("Drugs for " + days + " days!");//alert this in the browser
 })
 
+}// Delete drug
+$(document).on("click", ".delete", function () {
+  var id = $(this).attr("data-id");
+
+  if (confirm("Are you sure you want to delete this drug?")) {
+    $.ajax({
+      url: "/api/drugs/" + id,
+      type: "DELETE",  // hoặc method: "DELETE"
+      success: function (data) {
+        alert(data.message || "Drug deleted successfully!");
+        location.reload();
+      },
+      error: function (err) {
+        alert("Error deleting drug!");
+        console.error(err);
+      }
+    });
+  }
+});
+// Khi form add drug được submit
+$("#add_drug").submit(function(event){
+    alert("Drug inserted successfully!");
+});
+
+// Khi bấm nút delete trong manage.ejs
+if(window.location.pathname == "/manage"){
+    $ondelete = $(".delete");
+    $ondelete.click(function(){
+        var id = $(this).attr("data-id");
+
+        var request = {
+            "url" : `http://localhost:3100/api/drugs/${id}`,
+            "method" : "DELETE"
+        };
+
+        if(confirm("Do you really want to delete this drug?")){
+            $.ajax(request).done(function(response){
+                alert("Drug Deleted Successfully!");
+                location.reload();
+            });
+        }
+    });
 }
+
+// Khi form update drug được submit
+$("#update_drug").submit(function(event){
+    event.preventDefault();
+
+    var unindexed_array = $(this).serializeArray();
+    var data = {};
+
+    $.map(unindexed_array, function(n, i){
+        data[n['name']] = n['value'];
+    });
+
+    var request = {
+        "url" : `http://localhost:3100/api/drugs/${data.id}`,
+        "method" : "PUT",
+        "data" : data
+    };
+
+    $.ajax(request).done(function(response){
+        alert("Drug Updated Successfully!");
+        window.location.href = "/manage";
+    });
+});
